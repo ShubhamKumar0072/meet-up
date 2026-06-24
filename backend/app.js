@@ -1,0 +1,42 @@
+require("dotenv").config();
+const express = require("express");
+const connectDB = require("./config/db");
+const passport = require("./config/passport");
+const session = require("express-session");
+
+const authRoutes = require("./routes/authRoutes")
+
+
+const app=express();
+
+
+
+app.use(express.urlencoded({extended:true})); // to deconstruct data from body
+app.use(express.json()); //to convert/read jason data
+connectDB();
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false
+    })
+);
+app.use(passport.initialize());
+
+
+app.get("/",(req,res)=>{
+    res.send("This is BackEnd");
+});
+
+app.use("/auth",authRoutes);
+
+
+
+
+
+const PORT = process.env.PORT;
+
+
+app.listen(PORT,()=>{
+    console.log("Listining from port : ",PORT);
+});
