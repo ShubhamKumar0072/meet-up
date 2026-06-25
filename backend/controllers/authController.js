@@ -2,87 +2,43 @@ const User = require("../models/User");
 const crypto = require("crypto");
 const { generateToken } = require("../utils/jwt");
 
-const registerUser = async (req, res) => {
-
-    const { username, name, email, password } = req.body;
-
-    //if any fields are empty
-    if (!username || !name || !email || !password) {
-        return res.status(400).json({
-            message: "All fields are required"
-        });
-    }
-
-    //if username or email alredy exist
-    const existingUser = await User.findOne({
-        $or: [
-            { username },
-            { email }
-        ]
-    });
-
-    if (existingUser) {
-        return res.status(400).json({
-            message: "Username or email already exist"
-        });
-    }
-
-    const user = await User.create({
-        username,
-        name,
-        email,
-        password
-    });
-
-
-    res.json({
-        username, name, email, password
-    });
-
-};
-
-
 const googleCallback = async (req, res) => {
-    const googleId = req.user.id;
-    const name = req.user.displayName;
-    const email = req.user.emails[0].value;
-    const profilePic = req.user.photos[0].value;
+    try {
+        const googleId = req.user.id;
+        const name = req.user.displayName;
+        const email = req.user.emails[0].value;
+        const profilePic = req.user.photos[0].value;
 
-    let user = await User.findOne({ googleId });
+        let user = await User.findOne({ googleId });
 
-    const tempUsername = `temp_${crypto.randomBytes(4).toString("hex")}`;
+        const tempUsername = `temp_${crypto.randomBytes(4).toString("hex")}`;
 
 
-    if (!user) {
-        user = await User.create({
-            username: tempUsername,
-            googleId,
-            name,
-            email,
-            profilePic
-        });
-    }
-
-    const token = generateToken(user._id);
-
-    res.json({
-        token,
-        user: {
-            id: user._id,
-            username: user.username,
-            name: user.name,
-            email: user.email,
-            profilePic: user.profilePic,
-            bio: user.bio,
-            isSetupComplete: user.isSetupComplete
+        if (!user) {
+            user = await User.create({
+                username: tempUsername,
+                googleId,
+                name,
+                email,
+                profilePic
+            });
         }
-    });
 
+        const token = generateToken(user._id);
+
+        return res.redirect(
+            `${process.env.FRONTEND_URL}/?token=${token}`
+        )
+
+    } catch (error) {
+        console.log(error);
+        return res.redirect("http://localhost:5173/");
+    }
 }
 
 const completeSetup = async (req, res) => {
     const { username, publicKey, encryptedPrivateKey } = req.body;
-    
+
     if (req.user.isSetupComplete) {
         return res.status(400).json({
             message: "Setup already completed"
@@ -90,7 +46,7 @@ const completeSetup = async (req, res) => {
     }
 
 
-    const existingUser = await User.findOne({ username, _id: { $ne: req._id } });
+    const existingUser = await User.findOne({ username, _id: { $ne: req.user._id } });
     if (existingUser) {
         return res.status(400).json({
             message: "Username already taken"
@@ -109,8 +65,23 @@ const completeSetup = async (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res) => {
+    res.status(200).json({
+        success: true,
+        user: {
+            id: req.user._id,
+            email: req.user.email,
+            name: req.user.name,
+            username: req.user.username,
+            profilePic: req.user.profilePic,
+            bio: req.user.bio,
+            isSetupComplete: req.user.isSetupComplete,
+        }
+    });
+}
+
 module.exports = {
-    registerUser,
     googleCallback,
-    completeSetup
+    completeSetup,
+    getCurrentUser
 };

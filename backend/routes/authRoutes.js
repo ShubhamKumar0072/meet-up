@@ -1,16 +1,21 @@
 const express = require("express");
-const{registerUser, googleCallback, completeSetup} = require("./../controllers/authController");
+const{googleCallback, completeSetup, getCurrentUser} = require("./../controllers/authController");
 const passport = require("passport");
 const router = express.Router();
 const {authenticateUser} = require("../middleware/authMiddleware");
 
-router.post("/register",registerUser);
 
 router.get(
     "/google",
     passport.authenticate("google",{
         scope: ["profile", "email"]
     })
+);
+
+router.get(
+    "/me",
+    authenticateUser,
+    getCurrentUser
 );
 
 router.get(
