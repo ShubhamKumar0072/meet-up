@@ -10,7 +10,7 @@ export default function Navbar(){
 
 
             <div className="chat-list">
-                <Link to="/Home/chatpage"><div className="chat-item">Chat Name</div></Link>
+                <Link to="/chat"><div className="chat-item">Chat Name</div></Link>
                 <div className="chat-item">Chat Name</div>
                 <div className="chat-item">Chat Name</div>
                 <div className="chat-item">Chat Name</div>
@@ -31,8 +31,8 @@ export default function Navbar(){
             </div>
 
             <div className="my-profile">
-                <Link to="/Home/profile"><p>Shubham Kumar</p></Link>
-                <Link to="/Home/setting"><button>Settings</button></Link>
+                <Link to="/profile"><p>Shubham Kumar</p></Link>
+                <Link to="/setting"><button>Settings</button></Link>
             </div>
         </div>
     )

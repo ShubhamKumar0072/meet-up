@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const { generateToken } = require("../utils/jwt");
 
 const googleCallback = async (req, res) => {
-    console.log("Google callback is running");
+    //console.log("Google callback is running");
     try {
         const googleId = req.user.id;
         const name = req.user.displayName;
@@ -77,6 +77,7 @@ const getCurrentUser = (req, res) => {
             profilePic: req.user.profilePic,
             bio: req.user.bio,
             isSetupComplete: req.user.isSetupComplete,
+            encryptedPrivateKey: req.user.encryptedPrivateKey,
         }
     });
 }

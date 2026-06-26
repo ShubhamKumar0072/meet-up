@@ -1,6 +1,7 @@
 import { generateRSAKeys, encryptWithPin } from "../utils/cryptoService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { setPrivateKey } from "../store/keyStore";
 import axios from "axios";
 import "./SetUp.css";
 
@@ -51,6 +52,9 @@ function SetUp({ fetchCurrentUser }) {
 
             // Refresh current user
             await fetchCurrentUser();
+
+            // 4. Store decrypted private key in memory
+            setPrivateKey(privateKey);
 
             // Go to chat
             navigate("/chat");

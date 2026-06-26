@@ -98,7 +98,7 @@ function App() {
             path="/chat"
             element={
               isAuthenticated
-                ? (isSetupComplete ? <ChatPage /> : <Navigate to="/setup" />)
+                ? (isSetupComplete ? <ChatPage user={user}/> : <Navigate to="/setup" />)
                 : <Navigate to="/" />
             }
           />
