@@ -26,6 +26,7 @@ const googleCallback = async (req, res) => {
         }
 
         const token = generateToken(user._id);
+        //console.log(token);
 
         return res.redirect(
             `${process.env.VITE_FRONTEND_URL}/?token=${token}`

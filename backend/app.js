@@ -6,7 +6,8 @@ const passport = require("./config/passport");
 const session = require("express-session");
 const cors = require("cors");
 
-const authRoutes = require("./routes/authRoutes")
+const authRoutes = require("./routes/authRoutes");
+const conversationRoutes = require("./routes/conversationRoutes");
 
 
 const app=express();
@@ -36,6 +37,7 @@ app.get("/",(req,res)=>{
 });
 
 app.use("/auth",authRoutes);
+app.use("/conv",conversationRoutes);
 
 
 
