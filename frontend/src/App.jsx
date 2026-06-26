@@ -16,47 +16,45 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
+  const fetchCurrentUser = async () => {
+    try {
+      const url = new URL(window.location.href);
+      const urlToken = url.searchParams.get("token");
 
-        const url = new URL(window.location.href);
-        const urlToken = url.searchParams.get("token");
+      if (urlToken) {
+        localStorage.setItem("token", urlToken);
 
-        if (urlToken) {
-          localStorage.setItem("token", urlToken);
-
-          // remove token from URL (clean + safe)
-          window.history.replaceState({}, document.title, "/");
-        }
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-         import.meta.env.VITE_API_URL + "/auth/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-
-        setUser(response.data.user);
-
-      } catch (error) {
-        localStorage.removeItem("token");
-        setUser(null);
-      } finally {
-        setLoading(false);
+        // remove token from URL (clean + safe)
+        window.history.replaceState({}, document.title, "/");
       }
-    };
 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        import.meta.env.VITE_API_URL + "/auth/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      setUser(response.data.user);
+
+    } catch (error) {
+      localStorage.removeItem("token");
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCurrentUser();
-
   }, []);
 
   // console.log(user);
@@ -90,7 +88,7 @@ function App() {
             path="/setup"
             element={
               isAuthenticated
-                ? (isSetupComplete ? <Navigate to="/chat" /> : <SetUp />)
+                ? (isSetupComplete ? <Navigate to="/chat" /> : <SetUp fetchCurrentUser={fetchCurrentUser}/>)
                 : <Navigate to="/" />
             }
           />

@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const { generateToken } = require("../utils/jwt");
 
 const googleCallback = async (req, res) => {
+    console.log("Google callback is running");
     try {
         const googleId = req.user.id;
         const name = req.user.displayName;
@@ -27,7 +28,7 @@ const googleCallback = async (req, res) => {
         const token = generateToken(user._id);
 
         return res.redirect(
-            `${process.env.FRONTEND_URL}/?token=${token}`
+            `${process.env.VITE_FRONTEND_URL}/?token=${token}`
         )
 
     } catch (error) {
