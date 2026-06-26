@@ -8,6 +8,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 
 const app=express();
@@ -38,6 +39,7 @@ app.get("/",(req,res)=>{
 
 app.use("/auth",authRoutes);
 app.use("/conv",conversationRoutes);
+app.use("/msg",messageRoutes);
 
 
 
