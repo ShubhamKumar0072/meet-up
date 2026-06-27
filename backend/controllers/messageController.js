@@ -42,6 +42,10 @@ const sendMessage = async (req, res) => {
 
         conversation.lastMessage = "Encrypted Message";
         await conversation.save();
+        await message.populate(
+            "sender",
+            "username name profilePic"
+        );
 
         return res.status(201).json(message);
 

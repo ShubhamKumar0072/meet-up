@@ -69,7 +69,7 @@ function App() {
 
   return (
     <div className="app">
-      {user && <Navbar />}
+      {user && <Navbar user={user}/>}
       <div className="pages">
         <Routes>
 
@@ -95,7 +95,7 @@ function App() {
 
 
           <Route
-            path="/chat"
+            path="/chat/:conversationId"
             element={
               isAuthenticated
                 ? (isSetupComplete ? <ChatPage user={user}/> : <Navigate to="/setup" />)

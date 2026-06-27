@@ -1,14 +1,34 @@
 import "./ChatPage.css";
-import { hasPrivateKey } from "../store/keyStore";
-import { useState } from "react";
-
+import { hasPrivateKey, getPrivateKey } from "../store/keyStore";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { decryptWithPin } from "../utils/cryptoService";
 import { setPrivateKey } from "../store/keyStore";
+import { useParams } from "react-router-dom";
+import { decryptAESKey } from "../utils/rsaCrypto";
+import { encryptMessage, decryptMessage } from "../utils/messageCrypto";
+import axios from "axios";
+import { useRef } from "react"; //to control scrolling
+
+
 
 export default function OneChat({ user }) {
+    const { state } = useLocation();
+    const chatEndRef = useRef(null);
 
+    //Unlock setup if user refresh reloade pin
     const [needsUnlock, setNeedsUnlock] = useState(!hasPrivateKey());
     const [pin, setPin] = useState("");
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [aesKey, setAesKey] = useState(null);
+    const [decryptedMessages, setDecryptedMessages] = useState([]);
+    const [initialLoad, setInitialLoad] = useState(true); //control scroll
+
+    //function to scroll to bottom
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const handleUnlock = async (e) => {
         e.preventDefault();
@@ -26,6 +46,160 @@ export default function OneChat({ user }) {
             alert("Incorrect PIN");
         }
     }
+
+    const handelSendMessage = async (e) => {
+        e.preventDefault();
+
+        if (!message.trim()) {
+            return;
+        }
+
+        try {
+            //Encrypt the message.
+            const encryptedContent = await encryptMessage(
+                message,
+                aesKey
+            );
+
+            //send encrypted message
+            const token = localStorage.getItem("token");
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/msg/send`,
+                {
+                    conversationId,
+                    encryptedContent
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            setMessage("");
+
+            const decryptedNewMessage = {
+                ...response.data,
+                content: await decryptMessage(
+                    response.data.encryptedContent,
+                    aesKey
+                )
+            };
+
+            setDecryptedMessages(prev => [
+                ...prev,
+                decryptedNewMessage
+            ]);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const loadOlderMessages = async () => {
+
+        if (messages.length === 0) return;
+        try {
+
+            const token = localStorage.getItem("token");
+            const oldestMsgId = messages[0]._id;
+
+            const responce = await axios.get(
+                `${import.meta.env.VITE_API_URL}/msg/${conversationId}`,
+                {
+                    params: {
+                        before: oldestMsgId
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            const loadOlderMessages = responce.data;
+            //merge older in messages
+            setMessages(prev => [...loadOlderMessages, ...prev]);
+
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    //if user is unlocked
+    const { conversationId } = useParams();
+    //console.log(conversationId);
+
+    //fetch messages
+
+
+    useEffect(() => {
+        if (needsUnlock) return;
+
+        const fetchMessages = async () => {
+            const token = localStorage.getItem("token");
+
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}/msg/${conversationId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setMessages(response.data);
+            setInitialLoad(true); //to prevent scroll further
+        };
+
+        fetchMessages();
+    }, [conversationId, needsUnlock]);
+
+
+    useEffect(() => {
+        if (!aesKey || messages.length === 0) return;
+
+        const decryptAll = async () => {
+            const decrypted = await Promise.all(
+                messages.map(async (msg) => ({
+                    ...msg,
+                    content: await decryptMessage(
+                        msg.encryptedContent,
+                        aesKey
+                    )
+                }))
+            );
+
+            setDecryptedMessages(decrypted);
+        };
+
+        decryptAll();
+    }, [messages, aesKey]);
+
+    useEffect(() => {
+        if (initialLoad && decryptedMessages.length > 0) {
+            scrollToBottom();
+            setInitialLoad(false);
+        }
+    }, [decryptedMessages]);
+
+    useEffect(() => {
+        if (needsUnlock || !state?.conversation) return;
+
+        const conversation = state.conversation;
+
+        const encryptedAESKey =
+            conversation.participants[0]._id === user.id
+                ? conversation.encryptedAESKeys.user0
+                : conversation.encryptedAESKeys.user1;
+
+        const privateKey = getPrivateKey();
+
+        const key = decryptAESKey(encryptedAESKey, privateKey);
+
+        setAesKey(key);
+    }, [state, user.id, needsUnlock]);
+
+
 
     if (needsUnlock) {
         return (
@@ -57,22 +231,50 @@ export default function OneChat({ user }) {
     }
 
 
-
     return (
         <div className="ChatPage">
             <div className="chat-header">
                 Shubham Kumar
             </div>
             <div className="chat-body">
-                <div className="message left">&Lorem ipsum dolor sit amet consectetur adipisicing elit. Et voluptatum a laborum? Doloremque rem eveniet qui nihil nulla accusamus sit?</div>
-                <div className="message right">&Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit nisi neque, labore, modi excepturi ratione architecto vitae odio quas libero consectetur possimus minima eos nulla.</div>
-                <div className="message left">&Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos, saepe.</div>
-                <div className="message right">&Lorem ipsum dolor sit amet consectetur.</div>
-                <div className="message left">&Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi, itaque exercitationem? Fugiat totam quam doloribus praesentium optio fugit natus, enim, temporibus possimus reprehenderit accusamus iste debitis, omnis ipsum mollitia soluta sit consequuntur.</div>
+
+                {messages.length >= 30 && (
+                    <button
+                        onClick={loadOlderMessages}
+                        className="load-more-btn"
+                    >
+                        Load previous messages
+                    </button>
+                )}
+
+
+                {decryptedMessages.map((msg) => (
+                    <div
+                        key={msg._id}
+                        className={
+                            msg.sender._id === user.id
+                                ? "message right"
+                                : "message left"
+                        }
+                    >
+                        {msg.content}
+                    </div>
+                ))}
+
+                <div ref={chatEndRef} />
+
             </div>
             <div className="chat-footer">
-                <input className="chat-input" type="text" placeholder="Type a message" />
-                <button className="chat-send-btn">Send</button>
+                <form onSubmit={handelSendMessage}>
+                    <input
+                        className="chat-input"
+                        type="text"
+                        placeholder="Type a message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    />
+                    <button className="chat-send-btn">Send</button>
+                </form>
             </div>
         </div>
     );
