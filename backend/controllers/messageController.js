@@ -47,6 +47,10 @@ const sendMessage = async (req, res) => {
             "username name profilePic"
         );
 
+        //stock.io code
+        const io = req.app.get("io");
+        io.to(conversationId).emit("newMessage",message);
+
         return res.status(201).json(message);
 
     } catch (error) {

@@ -10,6 +10,8 @@ import { encryptMessage, decryptMessage } from "../utils/messageCrypto";
 import axios from "axios";
 import { useRef } from "react"; //to control scrolling
 
+import { socket } from "../socket";
+
 
 
 export default function OneChat({ user }) {
@@ -78,19 +80,6 @@ export default function OneChat({ user }) {
             );
 
             setMessage("");
-
-            const decryptedNewMessage = {
-                ...response.data,
-                content: await decryptMessage(
-                    response.data.encryptedContent,
-                    aesKey
-                )
-            };
-
-            setDecryptedMessages(prev => [
-                ...prev,
-                decryptedNewMessage
-            ]);
 
         } catch (error) {
             console.log(error);
@@ -198,6 +187,48 @@ export default function OneChat({ user }) {
 
         setAesKey(key);
     }, [state, user.id, needsUnlock]);
+
+
+    //Runs to make a connection to room with convId or leave one room
+    useEffect(() => {
+        if (needsUnlock) return;
+
+        socket.emit("joinConv", conversationId);
+
+        return()=>{
+            socket.emit("leaveConv",conversationId);
+        }
+        
+    }, [conversationId, needsUnlock]);
+
+    //Runs ones to start listning for incoming messages
+    useEffect(() => {
+
+        if (!aesKey) return;
+
+        const handleNewMessage = async (msg) => {
+
+            const decrypted = {
+                ...msg,
+                content: await decryptMessage(
+                    msg.encryptedContent,
+                    aesKey
+                )
+            };
+
+            setDecryptedMessages(prev => [
+                ...prev,
+                decrypted
+            ]);
+        };
+
+        socket.on("newMessage", handleNewMessage);
+
+        return () => {
+            socket.off("newMessage", handleNewMessage);
+        };
+
+    }, [aesKey]);
 
 
 
