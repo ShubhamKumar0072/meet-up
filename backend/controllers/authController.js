@@ -79,7 +79,7 @@ const getCurrentUser = (req, res) => {
             bio: req.user.bio,
             isSetupComplete: req.user.isSetupComplete,
             encryptedPrivateKey: req.user.encryptedPrivateKey,
-            createdAt: req.user.createdAt
+            createdAt: req.user.createdAt,
         }
     });
 }

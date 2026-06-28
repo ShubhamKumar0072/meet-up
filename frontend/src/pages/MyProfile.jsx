@@ -6,6 +6,8 @@ import {
     CalendarDays
 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+
 export default function MyProfile({ user }) {
 
     return (
@@ -96,9 +98,13 @@ export default function MyProfile({ user }) {
 
                 </div>
 
-                <button className="profile-edit-btn">
-                    Edit Profile
-                </button>
+                <Link to="/profile/edit">
+                    <button className="profile-edit-btn">
+                        Edit Profile
+                    </button>               
+                </Link>
+
+
 
             </div>
 

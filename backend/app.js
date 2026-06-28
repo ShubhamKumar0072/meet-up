@@ -11,6 +11,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 //socket
 const http = require("http");
@@ -75,6 +76,7 @@ app.get("/",(req,res)=>{
 app.use("/auth",authRoutes);
 app.use("/conv",conversationRoutes);
 app.use("/msg",messageRoutes);
+app.use("/user",userRoutes);
 
 
 

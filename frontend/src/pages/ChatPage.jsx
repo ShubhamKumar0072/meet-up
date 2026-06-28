@@ -322,8 +322,7 @@ export default function OneChat({ user }) {
                     <div>
                         {secUser && <h3>{secUser.name}</h3>}
                         
-
-                        <span>Secure Conversation 🔒</span>
+                        {secUser && <span>{secUser.username}</span>}
 
                     </div>
 

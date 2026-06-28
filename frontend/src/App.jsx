@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import ChatPage from './pages/ChatPage'
 import Settings from './pages/Settings'
 import LandingPage from './pages/LandingPage'
+import EditProfile from './pages/EditProfile'
 
 import { useEffect, useState } from 'react'
 import axios from "axios";
@@ -122,6 +123,14 @@ function App() {
             }
           />
 
+          <Route
+            path="/profile/edit"
+            element={
+              isAuthenticated
+                ? <EditProfile user={user} fetchCurrentUser={fetchCurrentUser}/>
+                : <Navigate to="/" />
+            }
+          />
 
         </Routes>
 
