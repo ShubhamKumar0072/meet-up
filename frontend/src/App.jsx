@@ -117,7 +117,7 @@ function App() {
             path="/profile"
             element={
               isAuthenticated
-                ? <MyPrfile />
+                ? <MyPrfile user={user}/>
                 : <Navigate to="/" />
             }
           />
