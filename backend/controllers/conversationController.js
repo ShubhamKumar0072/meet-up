@@ -6,18 +6,17 @@ const { encryptAESKey } = require("../utils/rsa");
 
 const createConversation = async (req, res) => {
     try {
-
-        const { receiverId } = req.body;
+        const { username } = req.body;
         const senderId = req.user._id;
 
-        if (!receiverId) {
+        if (!username) {
             return res.status(400).json({
-                message: "Receiver ID is required."
+                message: "username is required."
             });
         }
 
         const sender = await User.findById(senderId);
-        const receiver = await User.findById(receiverId);
+        const receiver = await User.findOne({ username });
 
         if (!receiver) {
             return res.status(404).json({
@@ -25,49 +24,79 @@ const createConversation = async (req, res) => {
             });
         }
 
-        //if conversation already exist
-        const exist = await Conversation.findOne({
+        const receiverId = receiver._id;
+
+        // check existing conversation
+        let conversation = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
         });
 
-        if (exist) {
-            return res.status(200).json(exist);
+        // if exists → just return populated
+        if (conversation) {
+            conversation = await Conversation.findById(conversation._id)
+                .populate("participants", "username name profilePic");
+
+            return res.status(200).json(conversation);
         }
 
-        //AES Keys generation
-        const aesKey = generateAESKey();
-
+        // check setup
         if (!sender.isSetupComplete || !receiver.isSetupComplete) {
             return res.status(400).json({
                 message: "Both users must complete setup."
             });
         }
 
+        // generate AES key
+        const aesKey = generateAESKey();
+
         const encryptedAESKeys = {
             user0: encryptAESKey(aesKey, sender.publicKey),
             user1: encryptAESKey(aesKey, receiver.publicKey),
         };
 
-
-        //create new conversation
-        const conversation = await Conversation.create({
+        // create conversation
+        conversation = await Conversation.create({
             participants: [senderId, receiverId],
             encryptedAESKeys
         });
+
+        // populate AFTER creation
+        conversation = await Conversation.findById(conversation._id)
+            .populate("participants", "username name profilePic");
+
+
+        //socket code
+        const io = req.app.get("io");
+        const userSocketMap = req.app.get("userSocketMap");
+        const receiverSocketId = userSocketMap.get(receiverId.toString());
+        const senderSocketId = userSocketMap.get(senderId.toString());
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newConversation", {
+                conversation,
+                createdByMe: false
+            });
+        }
+
+        if (senderSocketId) {  
+            io.to(senderSocketId).emit("newConversation", {
+                conversation,
+                createdByMe: true
+            });
+        }
+
 
         return res.status(201).json(conversation);
 
     } catch (error) {
         console.log(error);
-
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal server error"
         });
     }
-}
+};
 
-const getConversation = async(req,res)=>{
-    try{
+const getConversation = async (req, res) => {
+    try {
 
         const userId = req.user._id;
         const conversations = await Conversation.find({
@@ -79,7 +108,7 @@ const getConversation = async(req,res)=>{
 
         return res.status(200).json(conversations);
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.status(500).json({
             message: "Internal server error"

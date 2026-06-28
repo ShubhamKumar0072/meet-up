@@ -11,7 +11,6 @@ import LandingPage from './pages/LandingPage'
 import { useEffect, useState } from 'react'
 import axios from "axios";
 
-import { socket} from "./socket";
 
 function App() {
 

@@ -123,6 +123,13 @@ export default function OneChat({ user }) {
     //fetch messages
 
 
+
+    useEffect(() => {
+        setMessages([]);
+        setDecryptedMessages([]);
+        setAesKey(null);
+    }, [conversationId]);
+
     useEffect(() => {
         if (needsUnlock) return;
 
@@ -195,10 +202,10 @@ export default function OneChat({ user }) {
 
         socket.emit("joinConv", conversationId);
 
-        return()=>{
-            socket.emit("leaveConv",conversationId);
+        return () => {
+            socket.emit("leaveConv", conversationId);
         }
-        
+
     }, [conversationId, needsUnlock]);
 
     //Runs ones to start listning for incoming messages

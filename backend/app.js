@@ -29,7 +29,15 @@ app.set("io",io);  // now we can get io from req.app.get("io")
 //This function run when user get connected to socket.io
 // on -> used for listining
 // emit -> used for sending
+
+const userSocketMap = new Map(); // Contains userId -> socketId
+app.set("userSocketMap", userSocketMap);
+
 io.on("connection",(socket) => {
+
+    socket.on("setupUser",(userId)=>{
+        userSocketMap.set(userId,socket.id);
+    })
 
     socket.on("joinConv",(convId) => {
         socket.join(convId);
@@ -37,9 +45,8 @@ io.on("connection",(socket) => {
 
     socket.on("leaveConv",(convId)=>{
         socket.leave(convId);
-    })
-})
-
+    });
+});
 
 app.use(cors({
     origin: "http://localhost:5173",
