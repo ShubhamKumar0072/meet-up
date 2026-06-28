@@ -7,7 +7,7 @@ import { socket } from "../socket";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
-import {Search, Plus, Settings} from "lucide-react";
+import { Search, Plus, Settings, Sun, Moon } from "lucide-react";
 
 
 
@@ -18,10 +18,27 @@ export default function Navbar({ user }) {
 
     const [conversations, setConversations] = useState([]);
     const [username, setUsername] = useState("");
+    const [theme, setTheme] = useState(
+        localStorage.getItem("theme") || "light"
+    );
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => prev == "light" ? "dark" : "light");
+    };
 
     const handleCreateConv = async (e) => {
         e.preventDefault();
         if (!username.trim()) return;
+
+        if(!username.trim()==user.username){
+            alert("cant create conversation by himself");
+            return;
+        }
 
         try {
             const token = localStorage.getItem("token");
@@ -103,10 +120,18 @@ export default function Navbar({ user }) {
         <aside className="Navbar">
 
             <div className="navbar-header">
+                <div>
+                    <h1 className="nav-logo">
+                        💬 MeetUp
+                    </h1>
 
-                <h1 className="logo">
-                    💬 MeetUp
-                </h1>
+                    <button
+                        className="theme-btn"
+                        onClick={toggleTheme}
+                    >
+                        {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+                </div>
 
                 <p>
                     Secure conversations
@@ -144,7 +169,7 @@ export default function Navbar({ user }) {
                     return (
 
                         <NavLink
-                            className={({isActive})=>`chat-link ${isActive? "active":""}`}
+                            className={({ isActive }) => `chat-link ${isActive ? "active" : ""}`}
                             key={conversation._id}
                             to={`/chat/${conversation._id}`}
                             state={{ conversation }}
