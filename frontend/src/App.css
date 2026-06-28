@@ -5,11 +5,14 @@
 }
 
 .app{
-  display: flex;
+    display:flex;
+    height:100vh;
+    overflow:hidden;
 }
 
 .pages{
   flex: 1;
+    overflow-y:auto;
 }
 
 :root{

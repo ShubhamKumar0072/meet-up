@@ -8,6 +8,8 @@ import ChatPage from './pages/ChatPage'
 import Settings from './pages/Settings'
 import LandingPage from './pages/LandingPage'
 import EditProfile from './pages/EditProfile'
+import Empty from './pages/Empty'
+import UserManual from './pages/UserManual'
 
 import { useEffect, useState } from 'react'
 import axios from "axios";
@@ -106,6 +108,15 @@ function App() {
           />
 
           <Route
+            path="/chat"
+            element={
+              isAuthenticated
+                ? <Empty/>
+                : <Navigate to="/" />
+            }
+          />
+
+          <Route
             path="/setting"
             element={
               isAuthenticated
@@ -128,6 +139,15 @@ function App() {
             element={
               isAuthenticated
                 ? <EditProfile user={user} fetchCurrentUser={fetchCurrentUser}/>
+                : <Navigate to="/" />
+            }
+          />
+
+          <Route
+            path="/user-manual"
+            element={
+              isAuthenticated
+                ? <UserManual/>
                 : <Navigate to="/" />
             }
           />
