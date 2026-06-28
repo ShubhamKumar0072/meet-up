@@ -7,11 +7,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { clearPrivateKey } from "../store/keyStore";
 import { socket } from "../socket";
+import axios from "axios"
 
-export default function Settings({fetchCurrentUser}) {
+export default function Settings() {
     const navigate = useNavigate();
 
-    const handleLogout = async() => {
+    const handleLogout = async () => {
         // Remove JWT
         localStorage.removeItem("token");
 
@@ -23,9 +24,33 @@ export default function Settings({fetchCurrentUser}) {
 
         window.location.replace("/");
     };
-    const handelManual = ()=>{
+
+    const handelManual = () => {
         navigate("/user-manual");
+    };
+
+    const handelDelete = async () => {
+        try {
+
+            const token = localStorage.getItem("token");
+            const response = await axios.delete(
+                `${import.meta.env.VITE_API_URL}/auth/delete`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            window.location.replace("/");
+
+        } catch (error) {
+            console.log(error);
+            alert("cant delet user by some technical issue");
+            return;
+        }
     }
+
 
     return (
 
@@ -105,7 +130,7 @@ export default function Settings({fetchCurrentUser}) {
 
                     </div>
 
-                    <button className="danger-btn">
+                    <button className="danger-btn" onClick={handelDelete}>
                         Delete
                     </button>
 

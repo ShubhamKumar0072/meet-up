@@ -5,7 +5,8 @@ import {
     ShieldCheck,
     MessageCircle,
     KeyRound,
-    Lightbulb
+    Lightbulb,
+    Trash2
 } from "lucide-react";
 
 export default function UserManual() {
@@ -16,7 +17,7 @@ export default function UserManual() {
 
             <div className="manual-header">
 
-                <BookOpen size={60}/>
+                <BookOpen size={60} />
 
                 <h1>MeetUp User Manual</h1>
 
@@ -30,7 +31,7 @@ export default function UserManual() {
 
             <div className="manual-section">
 
-                <UserPlus size={28}/>
+                <UserPlus size={28} />
 
                 <div>
 
@@ -49,7 +50,7 @@ export default function UserManual() {
 
             <div className="manual-section">
 
-                <ShieldCheck size={28}/>
+                <ShieldCheck size={28} />
 
                 <div>
 
@@ -68,7 +69,7 @@ export default function UserManual() {
 
             <div className="manual-section">
 
-                <MessageCircle size={28}/>
+                <MessageCircle size={28} />
 
                 <div>
 
@@ -87,7 +88,7 @@ export default function UserManual() {
 
             <div className="manual-section warning">
 
-                <KeyRound size={28}/>
+                <KeyRound size={28} />
 
                 <div>
 
@@ -109,9 +110,38 @@ export default function UserManual() {
 
             </div>
 
+            <div className="manual-section warning">
+
+                <Trash2 size={28} />
+
+                <div>
+
+                    <h2>Account Deletion</h2>
+
+                    <p>
+                        Deleting your account is permanent and cannot be
+                        undone. Your profile, all conversations, and every
+                        encrypted message associated with your account will
+                        be permanently deleted.
+                    </p>
+
+                    <p className="warning-text">
+                        Because conversations are shared between both
+                        participants, deleting your account also permanently
+                        removes those conversations and messages from the
+                        other participant's account. This is an intentional
+                        security feature designed to ensure that no
+                        conversation data remains after an account is
+                        deleted.
+                    </p>
+
+                </div>
+
+            </div>
+
             <div className="manual-section">
 
-                <Lightbulb size={28}/>
+                <Lightbulb size={28} />
 
                 <div>
 

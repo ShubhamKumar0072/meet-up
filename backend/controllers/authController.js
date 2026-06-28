@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 const crypto = require("crypto");
 const { generateToken } = require("../utils/jwt");
 
@@ -84,8 +86,48 @@ const getCurrentUser = (req, res) => {
     });
 }
 
+const deleteAccount = async(req,res) => {
+    try{
+
+        const userId = req.user._id;
+        const conversations = await Conversation.find({
+            participants: userId
+        });
+
+        const conversationIds = conversations.map(
+            conv=> conv._id
+        );
+
+        await Message.deleteMany({
+            conversation: {
+                $in: conversationIds
+            }
+        });
+
+        await Conversation.deleteMany({
+            _id: {
+                $in: conversationIds
+            }
+        });
+
+        await User.findByIdAndDelete(userId);
+
+        res.status(200).json({
+            message: "Account sussessfully deleted"
+        })
+
+
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}
+
 module.exports = {
     googleCallback,
     completeSetup,
-    getCurrentUser
+    getCurrentUser,
+    deleteAccount
 };
