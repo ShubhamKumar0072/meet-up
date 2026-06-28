@@ -1,61 +1,267 @@
 .Navbar{
-    border: 2px solid black;
-    width: 260px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    box-sizing: border-box;
+    width:320px;
+    height:100vh;
+
+    background:var(--surface);
+    border-right:1px solid var(--border);
+
+    display:flex;
+    flex-direction:column;
+
+    padding:24px;
+    box-sizing:border-box;
+}
+
+/* Header */
+
+.navbar-header{
+    margin-bottom:30px;
 }
 
 .logo{
-    margin: 0;
-    margin-bottom: 20px;
+    margin:0;
+    color:var(--primary);
+    font-size:2rem;
+}
+
+.navbar-header p{
+    margin-top:8px;
+    color:var(--text-light);
+}
+
+/* Search */
+
+.search-form{
+    display:flex;
+    gap:10px;
+    margin-bottom:24px;
 }
 
 .search{
-    padding: 12px;
-    border: none;
-    background-color: aqua;
-    border-radius: 15px;
-    cursor: pointer;
-    width: 200px;
-    margin-bottom: 20px;
+    flex:1;
+
+    padding:12px 16px;
+
+    border:1px solid var(--border);
+    border-radius:12px;
+
+    background:var(--surface-2);
+    color:var(--text);
+
+    outline:none;
+    transition:.25s;
 }
+
+.search:focus{
+    border-color:var(--primary);
+}
+
+.search-form button{
+
+    width:48px;
+    border:none;
+    border-radius:12px;
+
+    background:var(--primary);
+    color:white;
+
+    font-size:1.3rem;
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.search-form button:hover{
+    background:var(--primary-hover);
+}
+
+/* Chat List */
 
 .chat-list{
-   
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    flex: 1;
-    overflow-y: auto;
+
+    flex:1;
+
+    overflow-y:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    padding-right:4px;
+
 }
+
+/* nice scrollbar */
+
+.chat-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.chat-list::-webkit-scrollbar-thumb{
+    background:var(--border);
+    border-radius:10px;
+}
+
+.chat-link{
+    text-decoration:none;
+}
+
 
 .chat-item{
-    cursor: pointer;
-    border: 2px solid red;
-    height: 60px;
-    width: 100%;
-    box-sizing: border-box;
-    flex-shrink: 0;
+
+    display:flex;
+    align-items:center;
+
+    gap:14px;
+
+    padding:12px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    color:var(--text);
+
 }
+
+.chat-item:hover{
+
+    background:var(--surface-2);
+
+    transform:translateX(4px);
+
+}
+
+.chat-link.active .chat-item{
+    background:var(--surface-2);
+}
+
+.chat-item img{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid var(--primary);
+
+}
+
+.chat-info{
+    overflow:hidden;
+}
+
+.chat-info h4{
+
+    margin:0;
+    font-size:1rem;
+
+}
+
+.chat-info p{
+
+    margin-top:5px;
+
+    color:var(--text-light);
+
+    font-size:.85rem;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+/* Bottom Profile */
 
 .my-profile{
-    margin-top: auto;
-    border-top: 1px solid #444;
-    padding-top: 15px;
 
-    display: flex;
-    justify-content: space-between;
-    height: 60px;
-    align-items: center;
+    margin-top:20px;
+
+    border-top:1px solid var(--border);
+
+    padding-top:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
 }
-.my-profile > p{
-    cursor: pointer;
+
+.profile-link{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:inherit;
+
+    text-decoration:none;
+
 }
 
+.profile-link img{
 
+    width:46px;
+    height:46px;
 
+    border-radius:50%;
 
+    object-fit:cover;
 
+    border:2px solid var(--accent);
+
+}
+
+.profile-link h4{
+
+    margin:0;
+
+}
+
+.profile-link span{
+
+    font-size:.8rem;
+
+    color:var(--text-light);
+
+}
+
+.settings-btn{
+
+    width:44px;
+    height:44px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--surface-2);
+
+    cursor:pointer;
+
+    color:var(--text);
+
+    font-size:1.1rem;
+
+    transition:.25s;
+
+}
+
+.settings-btn:hover{
+
+    background:var(--primary);
+
+    color:white;
+
+    transform:rotate(90deg);
+
+}

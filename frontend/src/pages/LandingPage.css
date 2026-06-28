@@ -1,0 +1,164 @@
+.LandingPage{
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    padding:70px 8%;
+}
+
+.hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:70px;
+    min-height:75vh;
+}
+
+.heroText{
+    flex:1;
+}
+
+.logo{
+    display:inline-block;
+    font-size:2.5rem;
+    font-weight:700;
+    color:var(--primary);
+    margin-bottom:25px;
+}
+
+.heroText h1{
+    font-size:3.5rem;
+    line-height:1.15;
+    margin-bottom:20px;
+}
+
+.heroText p{
+    color:var(--text-light);
+    font-size:1.1rem;
+    line-height:1.8;
+    max-width:650px;
+}
+
+.highlights{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+    margin-top:40px;
+}
+
+.highlights div{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    font-weight:600;
+}
+
+.loginCard{
+    width:380px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:40px;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+    text-align:center;
+}
+
+.loginCard h2{
+    margin-bottom:15px;
+}
+
+.loginCard p{
+    color:var(--text-light);
+    margin-bottom:35px;
+}
+
+.googleButton{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:var(--primary);
+    color:white;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.googleButton:hover{
+    background:var(--primary-hover);
+    transform:translateY(-2px);
+}
+
+.googleButton img{
+    width:22px;
+    height:22px;
+    background:white;
+    border-radius:50%;
+    padding:2px;
+}
+
+.loginCard small{
+    display:block;
+    margin-top:22px;
+    color:var(--text-light);
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:25px;
+    margin-top:70px;
+}
+
+.feature{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:30px;
+    transition:.25s;
+}
+
+.feature:hover{
+    transform:translateY(-5px);
+    border-color:var(--primary);
+}
+
+.feature h3{
+    margin-bottom:15px;
+}
+
+.feature p{
+    color:var(--text-light);
+    line-height:1.7;
+}
+
+@media(max-width:900px){
+
+    .hero{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .heroText h1{
+        font-size:2.5rem;
+    }
+
+    .highlights{
+        grid-template-columns:1fr;
+    }
+
+    .loginCard{
+        width:100%;
+        max-width:400px;
+    }
+
+    .features{
+        grid-template-columns:1fr;
+    }
+
+}

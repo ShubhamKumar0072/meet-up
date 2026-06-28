@@ -5,6 +5,9 @@ import axios from "axios";
 import { socket } from "../socket";
 
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+
+import {Search, Plus, Settings} from "lucide-react";
 
 
 
@@ -97,49 +100,117 @@ export default function Navbar({ user }) {
 
     //console.log(conversations);
     return (
-        <div className="Navbar">
-            <h1 className="logo">MeetUp</h1>
-            <form onSubmit={handleCreateConv}>
+        <aside className="Navbar">
+
+            <div className="navbar-header">
+
+                <h1 className="logo">
+                    💬 MeetUp
+                </h1>
+
+                <p>
+                    Secure conversations
+                </p>
+
+            </div>
+
+            <form
+                className="search-form"
+                onSubmit={handleCreateConv}
+            >
+
                 <input
                     className="search"
                     type="text"
-                    placeholder="Username"
+                    placeholder="Enter username..."
                     value={username}
-                    onChange={(e) => { setUsername(e.target.value) }}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
-                <button type="submit" >StartChat</button>
-            </form>
-            <br />
-            <br />
 
+                <button type="submit">
+                    +
+                </button>
+
+            </form>
 
             <div className="chat-list">
 
                 {conversations.map((conversation) => {
-                    //console.log(conversation);
-                    //console.log("User Data : ", user.id);
-                    const otheruser = conversation.participants.find(
+
+                    const otherUser = conversation.participants.find(
                         participant => participant._id !== user.id
                     );
 
-                    //console.log("other user : ", otheruser);
-
                     return (
-                        <Link to={`/chat/${conversation._id}`} key={conversation._id} state={{ conversation }}>
+
+                        <NavLink
+                            className={({isActive})=>`chat-link ${isActive? "active":""}`}
+                            key={conversation._id}
+                            to={`/chat/${conversation._id}`}
+                            state={{ conversation }}
+                        >
+
                             <div className="chat-item">
-                                <img src={otheruser.profilePic} alt={otheruser.name} width={40} height={40} />
-                                <span>{otheruser.name}</span>
+
+                                <img
+                                    src={otherUser.profilePic}
+                                    alt={otherUser.name}
+                                />
+
+                                <div className="chat-info">
+
+                                    <h4>
+                                        {otherUser.name}
+                                    </h4>
+
+                                    <p>
+                                        Click to continue chatting
+                                    </p>
+
+                                </div>
+
                             </div>
-                        </Link>
+
+                        </NavLink>
+
                     );
 
                 })}
+
             </div>
 
             <div className="my-profile">
-                <Link to="/profile"><p>{user.name}</p></Link>
-                <Link to="/setting"><button>Settings</button></Link>
+
+                <Link
+                    className="profile-link"
+                    to="/profile"
+                >
+
+                    <img
+                        src={user.profilePic}
+                        alt={user.name}
+                    />
+
+                    <div>
+
+                        <h4>{user.name}</h4>
+
+                        <span>View Profile</span>
+
+                    </div>
+
+                </Link>
+
+                <Link to="/setting">
+
+                    <button className="settings-btn">
+                        <Settings size={22} />
+                    </button>
+
+                </Link>
+
             </div>
-        </div>
+
+        </aside>
     )
 }
