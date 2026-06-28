@@ -1,4 +1,5 @@
 import "./ChatPage.css";
+import "./LockPage.css";
 import { hasPrivateKey, getPrivateKey } from "../store/keyStore";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -11,6 +12,7 @@ import axios from "axios";
 import { useRef } from "react"; //to control scrolling
 
 import { socket } from "../socket";
+import { LockKeyhole } from "lucide-react";
 
 
 
@@ -26,6 +28,7 @@ export default function OneChat({ user }) {
     const [aesKey, setAesKey] = useState(null);
     const [decryptedMessages, setDecryptedMessages] = useState([]);
     const [initialLoad, setInitialLoad] = useState(true); //control scroll
+    const [secUser,setSecUser] = useState(null);
 
     //function to scroll to bottom
     const scrollToBottom = () => {
@@ -118,7 +121,25 @@ export default function OneChat({ user }) {
 
     //if user is unlocked
     const { conversationId } = useParams();
-    //console.log(conversationId);
+    
+    
+    //featch Conversation
+    // useEffect(()=>{
+    //     if(needsUnlock) return;
+
+    //     const fetchConv = async () => {
+    //         const token = localStorage.getItem("token");
+    //         const responce = await axios.get(
+    //             `${import.meta.env.VITE_API_URL}/conv/${conversationId}`,
+    //             {
+    //                 headers: { Authorization: `Bearer ${token}` }
+    //             }
+    //         );
+
+    //         console.log(responce);
+
+    //     }
+    // },[])
 
     //fetch messages
 
@@ -182,6 +203,10 @@ export default function OneChat({ user }) {
         if (needsUnlock || !state?.conversation) return;
 
         const conversation = state.conversation;
+        const otherUser = conversation.participants.find(
+                        participant => participant._id !== user.id
+                    );
+        setSecUser(otherUser);
 
         const encryptedAESKey =
             conversation.participants[0]._id === user.id
@@ -241,17 +266,28 @@ export default function OneChat({ user }) {
 
     if (needsUnlock) {
         return (
-            <div className="UnlockPage">
+            <div className="lock-page">
 
-                <div className="unlock-box">
+                <div className="lock-box">
+
+                    <div className="lock-icon">
+                        <LockKeyhole size={34} />
+                    </div>
+
                     <h2>Unlock Chat</h2>
-                    <p>Enter your PIN to unlock your private key.</p>
 
-                    <form onSubmit={handleUnlock}>
+                    <p>
+                        Enter your 6-digit PIN to access your conversations.
+                    </p>
+
+                    <form
+                        className="lock-form"
+                        onSubmit={handleUnlock}
+                    >
 
                         <input
                             type="password"
-                            placeholder="Enter PIN"
+                            placeholder="Enter your PIN"
                             value={pin}
                             onChange={(e) => setPin(e.target.value)}
                         />
@@ -271,22 +307,45 @@ export default function OneChat({ user }) {
 
     return (
         <div className="ChatPage">
+
             <div className="chat-header">
-                Shubham Kumar
+
+                <div className="chat-user">
+
+                    {secUser && <img
+                        src={secUser.profilePic}
+                        alt={secUser.name}
+                    />}
+
+                    
+
+                    <div>
+                        {secUser && <h3>{secUser.name}</h3>}
+                        
+
+                        <span>Secure Conversation 🔒</span>
+
+                    </div>
+
+                </div>
+
             </div>
+
             <div className="chat-body">
 
                 {messages.length >= 30 && (
+
                     <button
                         onClick={loadOlderMessages}
                         className="load-more-btn"
                     >
                         Load previous messages
                     </button>
+
                 )}
 
-
                 {decryptedMessages.map((msg) => (
+
                     <div
                         key={msg._id}
                         className={
@@ -297,23 +356,38 @@ export default function OneChat({ user }) {
                     >
                         {msg.content}
                     </div>
+
                 ))}
 
                 <div ref={chatEndRef} />
 
             </div>
+
             <div className="chat-footer">
-                <form onSubmit={handelSendMessage}>
+
+                <form
+                    className="chat-form"
+                    onSubmit={handelSendMessage}
+                >
+
                     <input
                         className="chat-input"
                         type="text"
-                        placeholder="Type a message"
+                        placeholder="Type a message..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                     />
-                    <button className="chat-send-btn">Send</button>
+
+                    <button
+                        className="chat-send-btn"
+                    >
+                        Send
+                    </button>
+
                 </form>
+
             </div>
+
         </div>
     );
 }
