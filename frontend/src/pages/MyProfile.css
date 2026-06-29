@@ -159,3 +159,17 @@
     background:var(--primary-hover);
 
 }
+
+@media (max-width:400px){
+    .profile-page{
+        padding: 10px;
+    }
+    .profile-card{
+        padding: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    .pro-email{
+        font-size: .9rem;
+    }
+}

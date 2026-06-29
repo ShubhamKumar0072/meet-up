@@ -38,7 +38,7 @@ export default function MyProfile({ user }) {
 
                         <div>
                             <span>Email</span>
-                            <p>{user.email}</p>
+                            <p className="pro-email">{user.email}</p>
                         </div>
 
                     </div>

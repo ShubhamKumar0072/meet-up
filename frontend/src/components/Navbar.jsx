@@ -13,7 +13,7 @@ import { Search, Plus, Settings, Sun, Moon } from "lucide-react";
 
 
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, className, setNavbarOpen }) {
     const navigate = useNavigate();
 
     const [conversations, setConversations] = useState([]);
@@ -117,7 +117,7 @@ export default function Navbar({ user }) {
 
     //console.log(conversations);
     return (
-        <aside className="Navbar">
+        <aside className={`Navbar ${className}`}>
 
             <div className="navbar-header">
                 <div>
@@ -173,6 +173,7 @@ export default function Navbar({ user }) {
                             key={conversation._id}
                             to={`/chat/${conversation._id}`}
                             state={{ conversation }}
+                            onClick={()=>setNavbarOpen(false)}
                         >
 
                             <div className="chat-item">
@@ -209,6 +210,7 @@ export default function Navbar({ user }) {
                 <Link
                     className="profile-link"
                     to="/profile"
+                    onClick={()=>setNavbarOpen(false)}
                 >
 
                     <img
@@ -226,7 +228,7 @@ export default function Navbar({ user }) {
 
                 </Link>
 
-                <Link to="/setting">
+                <Link to="/setting" onClick={()=>setNavbarOpen(false)}>
 
                     <button className="settings-btn">
                         <Settings size={22} />

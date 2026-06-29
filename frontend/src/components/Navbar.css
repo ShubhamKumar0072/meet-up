@@ -298,3 +298,90 @@
     transform:rotate(90deg);
 
 }
+
+
+@media (max-width:768px){
+
+    .Navbar{
+
+        position:fixed;
+
+        top:0;
+        left:0;
+
+        width:100%;
+        height:100vh;
+
+        z-index:1000;
+
+        transform:translateY(-100%);
+        transition:transform .35s ease;
+
+        padding: 1rem;
+
+        border-right:none;
+
+    }
+
+    .navbar-header > div{
+        justify-content: space-between;
+        padding-right: 45px;
+        gap: 7rem;
+    }
+
+    .navbar-header > p{
+        display: none;
+    }
+
+    .nav-logo{
+        font-size: 2rem;
+    }
+
+    .Navbar.open{
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.menu-btn{
+
+    display:none;
+
+}
+
+@media(max-width:768px){
+
+    .menu-btn{
+
+        display:flex;
+
+        position:fixed;
+
+        top:16px;
+        right:15px;
+
+        width:40px;
+        height:40px;
+
+        border:none;
+        border-radius:12px;
+
+        background:var(--primary);
+        color:white;
+
+        justify-content:center;
+        align-items:center;
+
+        font-size:1.4rem;
+
+        cursor:pointer;
+
+        z-index:1100;
+
+        box-shadow:0 6px 18px rgba(0,0,0,.2);
+
+    }
+
+}

@@ -19,6 +19,7 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const[navbarOpen,setNavbarOpen] = useState(false);
 
   const fetchCurrentUser = async () => {
     try {
@@ -73,7 +74,26 @@ function App() {
 
   return (
     <div className="app">
-      {user && <Navbar user={user}/>}
+      {user &&
+
+        <div className="mobile-navbar">
+
+          <button
+            className="menu-btn"
+            onClick={() => setNavbarOpen(!navbarOpen)}
+          >
+            ☰
+          </button>
+
+          <Navbar
+            className={navbarOpen ? "open" : ""}
+            user={user}
+            setNavbarOpen={setNavbarOpen}
+          />
+
+        </div>
+
+      }
       <div className="pages">
         <Routes>
 
@@ -92,7 +112,7 @@ function App() {
             path="/setup"
             element={
               isAuthenticated
-                ? (isSetupComplete ? <Navigate to="/chat" /> : <SetUp fetchCurrentUser={fetchCurrentUser}/>)
+                ? (isSetupComplete ? <Navigate to="/chat" /> : <SetUp fetchCurrentUser={fetchCurrentUser} />)
                 : <Navigate to="/" />
             }
           />
@@ -102,7 +122,7 @@ function App() {
             path="/chat/:conversationId"
             element={
               isAuthenticated
-                ? (isSetupComplete ? <ChatPage user={user}/> : <Navigate to="/setup" />)
+                ? (isSetupComplete ? <ChatPage user={user} /> : <Navigate to="/setup" />)
                 : <Navigate to="/" />
             }
           />
@@ -111,7 +131,7 @@ function App() {
             path="/chat"
             element={
               isAuthenticated
-                ? <Empty/>
+                ? <Empty />
                 : <Navigate to="/" />
             }
           />
@@ -129,7 +149,7 @@ function App() {
             path="/profile"
             element={
               isAuthenticated
-                ? <MyPrfile user={user}/>
+                ? <MyPrfile user={user} />
                 : <Navigate to="/" />
             }
           />
@@ -138,7 +158,7 @@ function App() {
             path="/profile/edit"
             element={
               isAuthenticated
-                ? <EditProfile user={user} fetchCurrentUser={fetchCurrentUser}/>
+                ? <EditProfile user={user} fetchCurrentUser={fetchCurrentUser} />
                 : <Navigate to="/" />
             }
           />
@@ -147,7 +167,7 @@ function App() {
             path="/user-manual"
             element={
               isAuthenticated
-                ? <UserManual/>
+                ? <UserManual />
                 : <Navigate to="/" />
             }
           />

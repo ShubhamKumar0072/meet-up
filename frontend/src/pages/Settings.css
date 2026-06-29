@@ -167,3 +167,13 @@
     background:#dc2626;
 
 }
+
+@media (max-width:400px){
+    .settings-page{
+        padding: 10px;
+    }
+    .setting-item{
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
