@@ -11,10 +11,39 @@ export default function EditProfile({ user, fetchCurrentUser }) {
     const [userName, setUserName] = useState(user.username);
     const [bio, setBio] = useState(user.bio);
     const [profilePic, setProfilePic] = useState(null);
+    const [error, setError] = useState("");
+
     const navigate = useNavigate();
+
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+
+    const NAME_MIN = 2;
+    const NAME_MAX = 30;
+
+    const BIO_MAX = 150;
 
     const handleEdit = async (e) => {
         e.preventDefault();
+        setError("");
+
+        //name Validation
+        if (!name || name.trim().length < NAME_MIN || name.trim().length > NAME_MAX) {
+            setError(`Name must be between ${NAME_MIN} and ${NAME_MAX} characters`);
+            return;
+        }
+
+        //username validation
+        if (!usernameRegex.test(userName)) {
+            setError("Username must be 3–20 chars (letters, numbers, _ only)");
+            return;
+        }
+
+        //bio validation
+        if (bio && bio.length > BIO_MAX) {
+            setError(`Bio cannot exceed ${BIO_MAX} characters`);
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append("name", name);
@@ -40,8 +69,10 @@ export default function EditProfile({ user, fetchCurrentUser }) {
             navigate('/profile');
 
         } catch (error) {
-            return alert("username Exist");
-            console.log(error);
+            setError(
+                error.response?.data?.message ||
+                "Update failed"
+            );
         }
     }
 
@@ -86,6 +117,12 @@ export default function EditProfile({ user, fetchCurrentUser }) {
                     Update your public information visible to other users.
                 </p>
 
+                {error && (
+                    <div className="edit-error">
+                        {error}
+                    </div>
+                )}
+
                 <form
                     className="edit-profile-form"
                     onSubmit={handleEdit}
@@ -102,6 +139,7 @@ export default function EditProfile({ user, fetchCurrentUser }) {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            maxLength={NAME_MAX}
                         />
 
                     </div>
@@ -116,7 +154,8 @@ export default function EditProfile({ user, fetchCurrentUser }) {
                             id="username"
                             type="text"
                             value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
+                            onChange={(e) => setUserName(e.target.value.toLowerCase())}
+                            maxLength={20}
                         />
 
                     </div>
@@ -147,6 +186,7 @@ export default function EditProfile({ user, fetchCurrentUser }) {
                             rows="4"
                             value={bio}
                             onChange={(e) => setBio(e.target.value)}
+                            maxLength={BIO_MAX}
                         />
 
                     </div>

@@ -89,7 +89,7 @@ if(!user) return <div>Loading...</div>
                                 {
                                     user.isSetupComplete
                                         ? "End-to-End Encryption Enabled"
-                                        : "Encryption Not Configured. SetUp PIN to Enable It"
+                                        : "Encryption Not Configured"
                                 }
                             </p>
 

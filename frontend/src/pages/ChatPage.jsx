@@ -31,6 +31,9 @@ export default function OneChat({ user }) {
     const [initialLoad, setInitialLoad] = useState(true); //control scroll
     const [secUser, setSecUser] = useState(null);
 
+    const pinRegex = /^\d{6}$/;
+    const [error, setError] = useState("");
+
     const { conversationId } = useParams();
 
     //function to scroll to bottom
@@ -40,20 +43,27 @@ export default function OneChat({ user }) {
 
     const handleUnlock = async (e) => {
         e.preventDefault();
+        setError("");
+
+        if (!pinRegex.test(pin)) {
+            setError("PIN must be exactly 6 digits.");
+            return;
+        }
 
         try {
-
             const privateKey = await decryptWithPin(
                 user.encryptedPrivateKey,
                 pin
             );
+
             setPrivateKey(privateKey);
             setNeedsUnlock(false);
 
         } catch (err) {
-            alert("Incorrect PIN");
+            setError("Incorrect PIN.");
+            setPin("");
         }
-    }
+    };
 
     const handelSendMessage = async (e) => {
         e.preventDefault();
@@ -279,6 +289,11 @@ export default function OneChat({ user }) {
                     <p>
                         Enter your 6-digit PIN to access your conversations.
                     </p>
+                    {error && (
+                        <div className="lock-error">
+                            {error}
+                        </div>
+                    )}
 
                     <form
                         className="lock-form"
@@ -287,9 +302,14 @@ export default function OneChat({ user }) {
 
                         <input
                             type="password"
-                            placeholder="Enter your PIN"
+                            inputMode="numeric"
+                            maxLength={6}
+                            placeholder="Enter your 6-digit PIN"
                             value={pin}
-                            onChange={(e) => setPin(e.target.value)}
+                            onChange={(e) => {
+                                setPin(e.target.value.replace(/\D/g, ""));
+                                setError("");
+                            }}
                         />
 
                         <button type="submit">
@@ -320,15 +340,15 @@ export default function OneChat({ user }) {
 
 
                     <div>
-                        {secUser && 
-                        <Link 
-                            to={`/user/${secUser._id}`} 
-                            style={{ textDecoration: "none", color: "inherit" }} 
-                        >
-                            <h3>{secUser.name} </h3>
+                        {secUser &&
+                            <Link
+                                to={`/user/${secUser._id}`}
+                                style={{ textDecoration: "none", color: "inherit" }}
+                            >
+                                <h3>{secUser.name} </h3>
 
-                            <span>{secUser.username}</span>
-                        </Link>        
+                                <span>{secUser.username}</span>
+                            </Link>
                         }
 
                     </div>

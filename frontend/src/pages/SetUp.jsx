@@ -13,8 +13,25 @@ function SetUp({ fetchCurrentUser }) {
     const [pin, setPin] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    const pinRegex = /^\d{6}$/;
+
+    const [error, setError] = useState("");
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+
+        // 🔐 validation
+        if (!usernameRegex.test(username)) {
+            setError("Username must be 3–20 characters (letters, numbers, _ only)");
+            return;
+        }
+
+        if (!pinRegex.test(pin)) {
+            setError("PIN must be exactly 6 digits");
+            return;
+        }
 
         try {
             setLoading(true);
@@ -63,7 +80,7 @@ function SetUp({ fetchCurrentUser }) {
 
             console.error(error);
 
-            alert(
+            setError(
                 error.response?.data?.message ||
                 error.message ||
                 "Setup failed"
@@ -84,23 +101,31 @@ function SetUp({ fetchCurrentUser }) {
                     Choose a unique username and create a secure 6-digit PIN.
                 </p>
 
+                {error && (
+                    <div className="setup-error">
+                        {error}
+                    </div>
+                )}
+
                 <form className="setup-form" onSubmit={handleSubmit}>
 
                     <div className="input-group">
                         <input
                             type="text"
-                            placeholder="Username"
+                            placeholder="admin_123"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setUsername(e.target.value.toLowerCase())}
                         />
                     </div>
 
                     <div className="input-group">
                         <input
                             type="password"
-                            placeholder="Create 6-digit PIN"
+                            inputMode="numeric"
+                            maxLength={6}
+                            placeholder="6-digit PIN"
                             value={pin}
-                            onChange={(e) => setPin(e.target.value)}
+                            onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
                         />
                     </div>
 

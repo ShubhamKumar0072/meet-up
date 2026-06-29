@@ -4,6 +4,9 @@ const Message = require("../models/Message");
 const crypto = require("crypto");
 const { generateToken } = require("../utils/jwt");
 
+const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+const pinRegex = /^\d{6}$/;
+
 const googleCallback = async (req, res) => {
     //console.log("Google callback is running");
     try {
@@ -14,7 +17,7 @@ const googleCallback = async (req, res) => {
 
         let user = await User.findOne({ googleId });
 
-        const tempUsername = `temp_${crypto.randomBytes(4).toString("hex")}`;
+        const tempUsername = `user_${crypto.randomBytes(4).toString("hex")}`;
 
 
         if (!user) {
@@ -36,37 +39,71 @@ const googleCallback = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.redirect("http://localhost:5173/");
+        return res.redirect(`${process.env.VITE_FRONTEND_URL}`);
     }
 }
 
 const completeSetup = async (req, res) => {
-    const { username, publicKey, encryptedPrivateKey } = req.body;
+    try {
+        const { username, publicKey, encryptedPrivateKey } = req.body;
 
-    if (req.user.isSetupComplete) {
-        return res.status(400).json({
-            message: "Setup already completed"
+        if (!username || username.trim().length === 0) {
+            return res.status(400).json({
+                message: "Username cannot be empty"
+            });
+        }
+
+        // 🔐 Setup already done check
+        if (req.user.isSetupComplete) {
+            return res.status(400).json({
+                message: "Setup already completed"
+            });
+        }
+
+        // 🔐 Validate username format
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({
+                message: "Invalid username format"
+            });
+        }
+
+        // 🔐 Ensure publicKey exists
+        if (!publicKey || !encryptedPrivateKey) {
+            return res.status(400).json({
+                message: "Missing security keys"
+            });
+        }
+
+        // 🔐 Check username uniqueness
+        const existingUser = await User.findOne({
+            username,
+            _id: { $ne: req.user._id }
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                message: "Username already taken"
+            });
+        }
+
+        // 🧱 Save user setup
+        req.user.username = username;
+        req.user.publicKey = publicKey;
+        req.user.encryptedPrivateKey = encryptedPrivateKey;
+        req.user.isSetupComplete = true;
+
+        await req.user.save();
+
+        return res.status(200).json({
+            message: "Setup completed successfully"
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal Server Error"
         });
     }
-
-
-    const existingUser = await User.findOne({ username, _id: { $ne: req.user._id } });
-    if (existingUser) {
-        return res.status(400).json({
-            message: "Username already taken"
-        });
-    }
-
-    req.user.username = username;
-    req.user.publicKey = publicKey;
-    req.user.encryptedPrivateKey = encryptedPrivateKey;
-    req.user.isSetupComplete = true;
-
-    await req.user.save();
-
-    return res.status(200).json({
-        message: "Setup completed successfully"
-    });
 };
 
 const getCurrentUser = (req, res) => {
@@ -86,8 +123,8 @@ const getCurrentUser = (req, res) => {
     });
 }
 
-const deleteAccount = async(req,res) => {
-    try{
+const deleteAccount = async (req, res) => {
+    try {
 
         const userId = req.user._id;
         const conversations = await Conversation.find({
@@ -95,7 +132,7 @@ const deleteAccount = async(req,res) => {
         });
 
         const conversationIds = conversations.map(
-            conv=> conv._id
+            conv => conv._id
         );
 
         await Message.deleteMany({
@@ -117,7 +154,7 @@ const deleteAccount = async(req,res) => {
         })
 
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.status(500).json({
             message: "Internal Server Error"

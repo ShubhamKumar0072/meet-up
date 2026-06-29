@@ -134,3 +134,13 @@
     transform:translateY(-2px);
 
 }
+
+
+.edit-error {
+    background: #ffe5e5;
+    color: #d60000;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
