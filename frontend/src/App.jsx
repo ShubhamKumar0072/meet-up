@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage'
 import EditProfile from './pages/EditProfile'
 import Empty from './pages/Empty'
 import UserManual from './pages/UserManual'
+import Profile from './pages/Profile'
 
 import { useEffect, useState } from 'react'
 import axios from "axios";
@@ -168,6 +169,16 @@ function App() {
             element={
               isAuthenticated
                 ? <UserManual />
+                : <Navigate to="/" />
+            }
+          />
+
+
+          <Route
+            path="/user/:id"
+            element={
+              isAuthenticated
+                ? <Profile user={user} />
                 : <Navigate to="/" />
             }
           />

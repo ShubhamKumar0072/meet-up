@@ -13,6 +13,7 @@ import { useRef } from "react"; //to control scrolling
 
 import { socket } from "../socket";
 import { LockKeyhole } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 
@@ -28,7 +29,9 @@ export default function OneChat({ user }) {
     const [aesKey, setAesKey] = useState(null);
     const [decryptedMessages, setDecryptedMessages] = useState([]);
     const [initialLoad, setInitialLoad] = useState(true); //control scroll
-    const [secUser,setSecUser] = useState(null);
+    const [secUser, setSecUser] = useState(null);
+
+    const { conversationId } = useParams();
 
     //function to scroll to bottom
     const scrollToBottom = () => {
@@ -119,10 +122,7 @@ export default function OneChat({ user }) {
 
     }
 
-    //if user is unlocked
-    const { conversationId } = useParams();
-    
-    
+
     //featch Conversation
     // useEffect(()=>{
     //     if(needsUnlock) return;
@@ -204,8 +204,8 @@ export default function OneChat({ user }) {
 
         const conversation = state.conversation;
         const otherUser = conversation.participants.find(
-                        participant => participant._id !== user.id
-                    );
+            participant => participant._id !== user.id
+        );
         setSecUser(otherUser);
 
         const encryptedAESKey =
@@ -317,12 +317,19 @@ export default function OneChat({ user }) {
                         alt={secUser.name}
                     />}
 
-                    
+
 
                     <div>
-                        {secUser && <h3>{secUser.name}</h3>}
-                        
-                        {secUser && <span>{secUser.username}</span>}
+                        {secUser && 
+                        <Link 
+                            to={`/user/${secUser._id}`} 
+                            style={{ textDecoration: "none", color: "inherit" }} 
+                        >
+                            <h3>{secUser.name} </h3>
+
+                            <span>{secUser.username}</span>
+                        </Link>        
+                        }
 
                     </div>
 

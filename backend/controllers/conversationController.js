@@ -34,7 +34,7 @@ const createConversation = async (req, res) => {
         // if exists → just return populated
         if (conversation) {
             conversation = await Conversation.findById(conversation._id)
-                .populate("participants", "username name profilePic");
+                .populate("participants", "username name profilePic bio");
 
             return res.status(200).json(conversation);
         }
@@ -62,7 +62,7 @@ const createConversation = async (req, res) => {
 
         // populate AFTER creation
         conversation = await Conversation.findById(conversation._id)
-            .populate("participants", "username name profilePic");
+            .populate("participants", "username name profilePic bio");
 
 
         //socket code
@@ -103,7 +103,7 @@ const getConversation = async (req, res) => {
             participants: userId
         }).populate(
             "participants",
-            "username name profilePic"
+            "username name profilePic bio"
         );
 
         return res.status(200).json(conversations);
