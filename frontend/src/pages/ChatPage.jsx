@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 export default function OneChat({ user }) {
     const { state } = useLocation();
     const chatEndRef = useRef(null);
+    const chatBodyRef = useRef(null);
 
     //Unlock setup if user refresh reloade pin
     const [needsUnlock, setNeedsUnlock] = useState(!hasPrivateKey());
@@ -38,7 +39,26 @@ export default function OneChat({ user }) {
 
     //function to scroll to bottom
     const scrollToBottom = () => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        const chat = chatBodyRef.current;
+
+        if (!chat) return;
+
+        chat.scrollTo({
+            top: chat.scrollHeight,
+            behavior: "smooth"
+        });
+    };
+
+    const isNearBottom = () => {
+        const chat = chatBodyRef.current;
+
+        if (!chat) return true;
+
+        return (
+            chat.scrollHeight -
+            chat.scrollTop -
+            chat.clientHeight < 100
+        );
     };
 
     const handleUnlock = async (e) => {
@@ -243,7 +263,7 @@ export default function OneChat({ user }) {
 
     }, [conversationId, needsUnlock]);
 
-    //Runs ones to start listning for incoming messages
+    //Runs ones to start listning for incoming messages (Socket code)
     useEffect(() => {
 
         if (!aesKey) return;
@@ -258,10 +278,19 @@ export default function OneChat({ user }) {
                 )
             };
 
+            const shouldScroll = isNearBottom();
+
             setDecryptedMessages(prev => [
                 ...prev,
                 decrypted
             ]);
+
+            if (shouldScroll) {
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 10);
+            }
+
         };
 
         socket.on("newMessage", handleNewMessage);
@@ -357,7 +386,7 @@ export default function OneChat({ user }) {
 
             </div>
 
-            <div className="chat-body">
+            <div className="chat-body" ref={chatBodyRef}>
 
                 {messages.length >= 30 && (
 
